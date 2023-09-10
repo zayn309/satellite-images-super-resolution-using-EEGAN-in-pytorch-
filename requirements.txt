@@ -1,0 +1,15 @@
+tqdm
+matplotlib
+albumentations
+torchvision
+pandas
+numpy
+pytest
+torch
+kornia
+dataclasses
+Pillow
+pycocotools
+tensorboardX
+-e .
+
