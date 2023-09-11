@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn 
 from sr.models.EEGAN.UDSN import UDSN
 from sr.models.EEGAN.EESN import EESN
+from sr.base.base_model import BaseModel
 
-
-class EEGAN_generator(nn.Module):
+class EEGAN_generator(BaseModel):
   def __init__(self, in_nc,features):
     super(EEGAN_generator, self).__init__()
     self.UDSN = UDSN(in_channels=in_nc,features=features)
@@ -18,7 +18,7 @@ class EEGAN_generator(nn.Module):
     return x_base, x_sr, x5, x_lap
   
 def test_generator():
-  batch_size = 1
+  batch_size = 8
   in_channels = 4
   height, width = 64,64
   features = 64
