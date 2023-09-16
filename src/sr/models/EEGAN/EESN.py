@@ -1,9 +1,10 @@
+from sr.base.base_model import BaseModel
 import torch
 import torch.nn as nn
 import kornia
 from sr.models.EEGAN.Gen_components import  BeginEdgeConv,EESN_dense,MaskConv,FinalConv
 
-class EESN(nn.Module):
+class EESN(BaseModel):
     def __init__(self):
         super(EESN, self).__init__()
         self.beginEdgeConv = BeginEdgeConv() #  Output 64*64*64 input 3*64*64
