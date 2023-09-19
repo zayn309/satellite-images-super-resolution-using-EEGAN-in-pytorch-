@@ -10,7 +10,7 @@ kornia
 dataclasses
 Pillow
 pycocotools
-tensorboardX
 box
+
 -e .
 

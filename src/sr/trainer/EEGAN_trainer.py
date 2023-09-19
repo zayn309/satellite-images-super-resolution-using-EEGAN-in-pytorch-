@@ -119,6 +119,7 @@ class EEGAN_Trainer(BaseTrainer):
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
         if self.current_epoch % self.plot_freq == 0:
+            self.logger.info("==> plotting some examples <==")
             self.plot_examples()
         
         return log

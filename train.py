@@ -7,7 +7,5 @@ def main(config):
     trainer.train()
     
     
-    
 if __name__ == '__main__':
     config = get_config("config.json")
-    
