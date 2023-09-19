@@ -3,7 +3,7 @@ from sr.base.base_data_loader import BaseDataLoader
 from sr.datsets.sr_dataset import SrDataset
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-
+from sr.utils.utils import get_config
 
 class MnistDataLoader(BaseDataLoader):
     """
@@ -20,7 +20,17 @@ class MnistDataLoader(BaseDataLoader):
 
 class SR_dataLoader(BaseDataLoader):
     
-    def __init__(self, batch_size, shuffle=True, validation_split=0.0, num_workers=1, training=True):
+    def __init__(self,config):
+        
+        self.config = config
+        
+        self.batch_size = self.config.data_loader.args.batch_size
+        self.data_dir_HR = self.config.data_loader.args.data_dir_HR
+        self.data_dir_LR = self.config.data_loader.args.data_dir_LR
+        self.shuffle = self.config.data_loader.args.shuffle
+        self.validation_split = self.config.data_loader.args.validation_split
+        self.num_workers = self.config.data_loader.args.num_workers
+        
         lr_data_transforms = A.Compose([
             A.Resize(64,64),
             A.Normalize( 
@@ -37,14 +47,13 @@ class SR_dataLoader(BaseDataLoader):
             ),
             ToTensorV2(),
         ])
-        self.dataset = SrDataset(lr_transform = lr_data_transforms, hr_transform = hr_data_transforms )
-        super().__init__(self.dataset, batch_size, shuffle, validation_split, num_workers)
+        self.dataset = SrDataset(LR_root=self.data_dir_LR,HR_root=self.data_dir_HR,
+                                 lr_transform = lr_data_transforms, hr_transform = hr_data_transforms )
+        super().__init__(self.dataset, self.batch_size, self.shuffle, self.validation_split, self.num_workers)
         
 def test():
-    sr_loader = SR_dataLoader(batch_size=32, shuffle=True, validation_split=0.2, num_workers=0)
-    for batch in sr_loader:
-        lr,hr = batch
-        print(lr.shape)
-        print(hr.shape)
-        break
-test()
+    sr_loader = SR_dataLoader(config= get_config('config.json'))
+    data_loader_val = sr_loader.split_validation()
+    print(f'the number of training batches: {len(sr_loader)}')
+    print(f'the number of validation batches: {len(data_loader_val)}')
+        

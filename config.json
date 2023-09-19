@@ -1,0 +1,74 @@
+{
+    "arch" : "EEGAN",
+    "n_gpu": 1,
+    "scale": 4,
+    "lr_width": 64,
+    "hr_width": 256,
+    "network_G": {
+        "which_model_G": "UDSN_EESN",
+        "in_nc": 4,
+        "features":64,
+        "args": {}
+    },
+    "network_D": {
+        "which_model_G": "discriminator_vgg_128",
+        "in_nc": 4,
+        "features": 64,
+        "args": {}
+    },
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr_G": 0.0002,
+            "beta1_G": 0.9,
+            "beta2_G": 0.99,
+            
+            "lr_D": 0.0002,
+            "beta1_D": 0.9,
+            "beta2_D": 0.99
+        }
+    },
+    "data_loader": {
+        "type": "SR_dataLoader",
+        "args":{
+            "data_dir_HR": "data/SR_data/HR/",
+            "data_dir_LR": "data/SR_data/LR/",
+            "batch_size": 4,
+            "shuffle": true,
+            "validation_split": 0.0219,
+            "num_workers": 0
+        }
+    },
+    "metrics": ["psnr", "ssim", "mse"],
+    "LR_Scheduler": {
+        "initial_lr" : 2e-4,
+        "final_lr": 1e-5,
+        "decay_factor": 0.9,
+        "verbose" : false
+    },
+    "loss": {
+        "terms": ["adv","cont", "cst" ],
+        "alpha" :  1e-3,
+        "lamda" : 5
+    },
+    "train": {
+        "niter": 100,
+        "manual_seed": 10,
+        "train_val_freq":50,
+        "val_freq": 11,
+        "resume": null,
+        "save_dir": "saved/check points",
+        "plote_examples_freq": 15,
+        "save_period": 10
+    },
+    "examples_dir": {
+        "base_image": "saved/plotted examples/base image",
+        "edge" : "saved/plotted examples/edge",
+        "learned_edge": "saved/plotted examples/learned edge",
+        "SR_image": "saved/plotted examples/SR image"
+    },
+    "logger": {
+      "save_checkpoint_freq": 15,
+      "log_step": 100
+    }
+}

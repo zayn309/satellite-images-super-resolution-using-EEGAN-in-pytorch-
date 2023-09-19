@@ -18,11 +18,13 @@ list_of_files = [
     f"src/{project_name}/test/__init__.py",
     f"src/{project_name}/trainer/__init__.py",
     f"src/{project_name}/datsets/__init__.py",
-    f"__init__.py",
-    f"config.json",
-    f"config_GAN.json",
-    f"requirements.txt",
-    f"setup.py"
+    "__init__.py",
+    "config.json",
+    "config_GAN.json",
+    "requirements.txt",
+    "setup.py",
+    "saved/"
+    
 ]
 
 

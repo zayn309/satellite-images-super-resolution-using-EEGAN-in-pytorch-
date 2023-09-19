@@ -3,7 +3,10 @@ from pathlib import Path
 from collections import OrderedDict
 from datetime import datetime
 import os
-
+from box import ConfigBox
+import random
+import numpy as np
+import tifffile as tiff
 import torch
 
 def read_json(fname):
@@ -32,23 +35,59 @@ def mkdirs(paths):
         for path in paths:
             mkdir(path)
 
-def save_checkpoint(model, optimizer,logger, filename="my_checkpoint.pth.tar",):
-    print("=> Saving checkpoint")
-    checkpoint = {
-        "state_dict": model.state_dict(),
-        "optimizer": optimizer.state_dict(),
-    }
-    torch.save(checkpoint, filename)
+
+def get_config(config_path):
+    content = read_json(config_path)
+    config = ConfigBox(content)
+    return config 
 
 
-def load_checkpoint(checkpoint_file, model, optimizer, lr,logger):
-    print("=> Loading checkpoint")
-    checkpoint = torch.load(checkpoint_file, map_location="cuda")
-    model.load_state_dict(checkpoint["state_dict"])
-    optimizer.load_state_dict(checkpoint["optimizer"])
 
-    # If we don't do this then it will just have learning rate of old checkpoint
-    # and it will lead to many hours of debugging \:
-    for param_group in optimizer.param_groups:
-        param_group["lr"] = lr
+def set_random_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
+def dict2str(opt, indent_l=1):
+    '''dict to string for logger'''
+    msg = ''
+    for k, v in opt.items():
+        if isinstance(v, dict):
+            msg += ' ' * (indent_l * 2) + k + ':[\n'
+            msg += dict2str(v, indent_l + 1)
+            msg += ' ' * (indent_l * 2) + ']\n'
+        else:
+            msg += ' ' * (indent_l * 2) + k + ': ' + str(v) + '\n'
+    return msg
+
+
+def plot_examples(I_Base, lap, learned_lap, I_sr, config):
+    def save_images(image_tensor, save_dir, prefix):
+        for i, image in enumerate(image_tensor):
+            image = image.permute(1, 2, 0).cpu().numpy()
+            save_path = str(Path(save_dir) / f"{prefix}_{counter}.tiff" )
+            tiff.imsave(save_path, image)
+    
+    if not isinstance(I_Base, torch.Tensor):
+        raise ValueError("Input batch should be a torch.Tensor")
+
+    if len(I_Base.shape) != 4:
+        raise ValueError("Input batch should be in the shape of (batch_size, channels, width, height)")
+
+    counter = len(os.listdir(Path(config.examples_dir.base_image))) + 1
+    
+    # Save I_Base images
+    save_images(I_Base, config.examples_dir.base_image, "I_Base")
+    
+    # Save lap images
+    save_images(lap, config.examples_dir.edge, "lap")
+    
+    # Save learned_lap images
+    save_images(learned_lap, config.examples_dir.learned_edge, "learned_lap")
+    
+    # Save I_sr images
+    save_images(I_sr, config.examples_dir.SR_image, "I_sr")
+
+    # Return the updated counter
+    return counter

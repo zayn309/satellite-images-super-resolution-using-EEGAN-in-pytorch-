@@ -5,7 +5,7 @@ import tifffile as tiff
 import numpy as np
 
 class SrDataset(Dataset):
-    def __init__(self,LR_root = "data\SR_data\LR\\", HR_root= "data\SR_data\HR\\",lr_transform = None,hr_transform = None):
+    def __init__(self,LR_root ,HR_root,lr_transform = None,hr_transform = None):
         
         self.LR_root = LR_root
         self.HR_root = HR_root

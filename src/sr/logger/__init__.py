@@ -4,7 +4,6 @@ import logging
 
 logging_string = '''[Time: %(asctime)s]
 [logging level: %(levelname)s]
-[module: %(module)s]
 [message: %(message)s]
 -----------------------------------'''
 log_dir = 'logs'

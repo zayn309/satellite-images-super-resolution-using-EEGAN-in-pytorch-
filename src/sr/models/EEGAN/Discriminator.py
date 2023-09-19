@@ -66,4 +66,3 @@ def test_Discriminator():
   output = model(input_tensor)
   print(output.shape)
   
-test_Discriminator()

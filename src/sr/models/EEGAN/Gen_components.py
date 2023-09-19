@@ -206,7 +206,7 @@ class MaskConv(nn.Module): ## mask branch
         return x
 
 class FinalConv(nn.Module):
-    def __init__(self, in_channels = 256, out_channels = 64, scale_factor = 4):
+    def __init__(self, in_channels , out_channels, scale_factor):
         super(FinalConv, self).__init__()
         self.up = UpsamplingBlock(in_channels, out_channels, scale_factor)
         
