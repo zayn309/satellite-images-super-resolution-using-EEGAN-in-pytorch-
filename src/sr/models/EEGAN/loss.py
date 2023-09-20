@@ -20,12 +20,13 @@ class ContentLoss(nn.Module):
         super(ContentLoss, self).__init__()
         self.DEVICE = DEVICE
         self.config = config
+        self.vgg = None
         try:
             self.logger.info("===> loading the vgg19 model <===")
             self.vgg = torch.hub.load('pytorch/vision:v0.9.0', 'vgg19', pretrained=True).features[:36].eval().to(self.DEVICE)
             self.logger.info("===> the vgg19 loaded successfully <===")
         except :
-            logger.exception("the vgg model is not loaded properly, cheack you internet connection!")
+            self.logger.exception("the vgg model is not loaded properly, cheack you internet connection!")
         
         self.loss = CharbonnierLoss().eval().to(self.DEVICE)
         self.BATCH_SIZE = self.config.data_loader.args.batch_size

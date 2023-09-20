@@ -57,13 +57,16 @@ class BaseTrainer:
                  f'generator: \n {str(self.model_G)}\n' +
                  f'Discrimininator: \n {str(self.model_D)}\n' +
                  f'optimizers: {self.config.optimizer.type}\n' +
-                 f'the training will last for {self.epochs} starting from epoch {self.current_epoch}\n')
+                 f'the training will last for {self.epochs} starting from epoch {self.current_epoch}\n'
+                 f'the training will be done on {self.device} device')
 
         for epoch in range(self.current_epoch, self.epochs + 1):
+            print(f'started epoch numner {epoch}')
             result = self._train_epoch(epoch)
             #result = {'psnr': 30.55, 'ssim' : 0.6565 , 'mse': 2.46452, 'vgg Loss': 502.012}
             # save logged informations into log dict
-            log = {'epoch': epoch}
+            
+            log = {'results of epoch ': epoch}
             log.update(result)
             log = dict2str(log)
             # print logged informations to the screen

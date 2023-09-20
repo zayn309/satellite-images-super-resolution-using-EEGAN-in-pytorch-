@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from tqdm import tqdm 
 from sr.base.base_trainer import BaseTrainer
 from sr.models.EEGAN.generator import EEGAN_generator
 from sr.models.EEGAN.Discriminator import Discriminator_VGG_128
@@ -27,7 +28,7 @@ class EEGAN_Trainer(BaseTrainer):
         data_loader = SR_dataLoader(config)
         
         val_data_loader = None
-        if self.config.data_loader.args.validation_split:
+        if config.data_loader.args.validation_split:
             val_data_loader = data_loader.split_validation()
         
         metrics = Metrics(config)
@@ -59,9 +60,8 @@ class EEGAN_Trainer(BaseTrainer):
         self.model_D.train()
         total_loss = 0
         log = {}
-        for batch_idx, (data, target) in enumerate(self.data_loader):
+        for batch_idx, (data, target) in enumerate(tqdm(self.data_loader)):
             data, target = data.to(self.device), target.to(self.device)
-            
             # train the the disc with the adv loss
             
             """

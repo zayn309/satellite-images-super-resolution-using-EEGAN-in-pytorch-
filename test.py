@@ -1,13 +1,14 @@
-from sr.data_loader.data_loaders import SR_dataLoader
-import tifffile as tiff
-from sr.utils.utils import (get_config, plot_examples)
-import os
-from pathlib import Path
-import torch
-import numpy as np
-import matplotlib.pyplot as plt 
+# from sr.data_loader.data_loaders import SR_dataLoader
+# import tifffile as tiff
+# from sr.utils.utils import (get_config, plot_examples)
+# import os
+# from pathlib import Path
+# import torch
+# import numpy as np
+# import matplotlib.pyplot as plt 
+# from tqdm import tqdm 
 # print(mp.cpu_count())
-
+from sr.utils.utils import dict2str
 # class ExampleModel(nn.Module):
 #     def __init__(self):
 #         super(ExampleModel, self).__init__()
@@ -33,3 +34,11 @@ import matplotlib.pyplot as plt
 # _, hr = 
 
 # plot_examples()
+
+result = {
+    "results of epoch ": 1,
+    'psnr': 30.55,
+    'ssim' : 0.6565 ,
+    'mse': 2.46452,
+    'vgg Loss': 502.012}
+print(dict2str(result))
