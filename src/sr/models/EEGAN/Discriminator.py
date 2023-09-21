@@ -55,6 +55,9 @@ class Discriminator_VGG_128(nn.Module):
         fea = self.lrelu(self.linear1(fea))
         out = self.linear2(fea)
         return out
+    
+    def __str__(self):
+        return f'{super().__str__()} '
 
 def test_Discriminator():
   batch_size = 8

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm 
 from sr.base.base_trainer import BaseTrainer
-from sr.models.EEGAN.generator import EEGAN_generator
+from sr.models.EEGAN.Gen_components import ESRGAN_EESN
 from sr.models.EEGAN.Discriminator import Discriminator_VGG_128
 from sr.data_loader.data_loaders import SR_dataLoader
 from sr.metrics.metrics import Metrics
@@ -10,14 +10,13 @@ from sr.models.EEGAN.loss import (CharbonnierLoss, ContentLoss)
 from sr.models.EEGAN.lr_scheduler import LR_Scheduler
 from sr.utils.utils import plot_examples
 
-# model_G,model_D , opt_G , opt_D , config , logger , data_loader = None , metrics = None,  data_loader_valid = None 
 class EEGAN_Trainer(BaseTrainer):
     """
     Trainer class
     """
     def __init__(self, config ,logger):
 
-        generator = EEGAN_generator(config.network_G.in_nc,config.network_G.features,scale_factor=config.scale)
+        generator = ESRGAN_EESN(config.network_G.in_nc,config.network_G.out_nc,config.network_G.features,config.network_G.nb)
         discriminator = Discriminator_VGG_128(config.network_D.in_nc,config.network_D.features)
         
         opt_G = torch.optim.Adam(generator.parameters(),
@@ -49,10 +48,12 @@ class EEGAN_Trainer(BaseTrainer):
         self.loss_terms = self.config.loss.terms
         self.alpha = self.config.loss.alpha
         self.lamda = self.config.loss.lamda
+        self.gamma = self.config.gamma
         
         self.consistencyLoss = CharbonnierLoss().to(self.device)
         self.contentLoss = ContentLoss(self.device,logger=self.logger)
         self.BCE = nn.BCEWithLogitsLoss()
+        self.l1_loss = nn.L1Loss()
         
     def _train_epoch(self, epoch):
         # L(θG, θD) = Losscont(θG) + αLossadv(θG, θD)+λLosscst(θG)
@@ -62,49 +63,53 @@ class EEGAN_Trainer(BaseTrainer):
         log = {}
         for batch_idx, (data, target) in enumerate(tqdm(self.data_loader)):
             data, target = data.to(self.device), target.to(self.device)
-            # train the the disc with the adv loss
             
-            """
-                Then we feed IBase and IHR into D to determine their
-                authenticities, real or fake. We train the discriminator by
-                minimizing the adversarial loss, which can encourage G to
-                generate the reconstructed image ISR close to the ground truth
-                IHR. This process can be formatted as follows:
-                Lossadv(θD) = −logD(IHR) − log(1 − D(G(ILR)))
-            """
+            
+            # train the generator with the consistency loss and the content loss
+            
             with torch.cuda.amp.autocast():
                 I_base , I_sr,_,_ = self.model_G(data)
+                disc_fake = self.model_D(I_base)
+                # pixel loss
+                pixel_loss =  self.l1_loss(I_base,target)
+                # vgg loss
+                content_loss =  self.contentLoss(I_base,target)
+                # adverserial loss
+                gen_adv_loss = self.alpha * self.BCE(disc_fake,torch.ones_like(disc_fake))
+                # charpo_ loss
+                consistency_loss = self.consistencyLoss(I_sr, target)
+                loss_gen = content_loss + self.lamda * consistency_loss + self.alpha * gen_adv_loss + self.gamma * pixel_loss
+            
+            self.opt_G.zero_grad()
+            self.G_scaler.scale(loss_gen).backward()
+            self.G_scaler.step(self.opt_G)
+            self.G_scaler.update()
+            
+            
+            with torch.cuda.amp.autocast():
+                
                 disc_real = self.model_D(target)
                 disc_fake = self.model_D(I_base.detach())
                 disc_loss_real = self.BCE(
                     disc_real, torch.ones_like(disc_real) - 0.1 * torch.rand_like(disc_real)
                 )
                 disc_loss_fake = self.BCE(disc_fake, torch.zeros_like(disc_fake))
-                loss_disc = self.alpha * (disc_loss_fake + disc_loss_real)
+                loss_disc = (disc_loss_fake + disc_loss_real) / 2
 
             self.opt_D.zero_grad()
             self.D_scaler.scale(loss_disc).backward()
             self.D_scaler.step(self.opt_D)
             self.D_scaler.update()
             
-            # train the generator with the consistency loss and the content loss
-            
-            with torch.cuda.amp.autocast():
-                content_loss =  self.contentLoss(I_base,target)
-                consistency_loss = self.consistencyLoss(I_sr, target)            
-                loss_gen = content_loss + self.lamda * consistency_loss
-            
-            self.opt_G.zero_grad()
-            self.G_scaler.scale(loss_gen).backward()
-            self.G_scaler.step(self.opt_G)
-            self.G_scaler.update()
 
             total_loss = loss_disc + loss_gen
             
-            log.update({"total_loss" : total_loss,
-                        "vgg_loss" : content_loss,
-                        "cst_loss" : consistency_loss,
-                        "adv_loss" : loss_disc
+            log.update({"total_loss" : total_loss.item(),
+                        "vgg_loss" : content_loss.item(),
+                        "cst_loss" : consistency_loss.item(),
+                        "pixel_loss" : pixel_loss.item,
+                        "loss_adv": gen_adv_loss,
+                        "loss_disc" : loss_disc
                         })
             
             if batch_idx == self.len_epoch:

@@ -7,7 +7,9 @@
     "network_G": {
         "which_model_G": "UDSN_EESN",
         "in_nc": 4,
+        "out_nc":4,
         "features":64,
+        "nb" : 23,
         "args": {}
     },
     "network_D": {
@@ -47,18 +49,19 @@
         "verbose" : false
     },
     "loss": {
-        "terms": ["adv","cont", "cst" ],
+        "terms": ["adv","cont", "cst","pixel" ],
         "alpha" :  1e-3,
-        "lamda" : 5
+        "lamda" : 5,
+        "gamma":1e-2
     },
     "train": {
-        "niter": 100,
+        "niter": 500,
         "manual_seed": 10,
         "train_val_freq":50,
-        "val_freq": 11,
+        "val_freq": 1,
         "resume": null,
         "save_dir": "saved/check points",
-        "plote_examples_freq": 15,
+        "plote_examples_freq": 5,
         "save_period": 10
     },
     "examples_dir": {
@@ -68,7 +71,7 @@
         "SR_image": "saved/plotted examples/SR image"
     },
     "logger": {
-      "save_checkpoint_freq": 15,
+      "save_checkpoint_freq": 50,
       "log_step": 100
     }
 }

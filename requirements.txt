@@ -10,7 +10,7 @@ kornia
 dataclasses
 Pillow
 pycocotools
-box
+python-box
 
 -e .
 

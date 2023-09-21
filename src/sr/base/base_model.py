@@ -19,7 +19,8 @@ class BaseModel(nn.Module):
     def __str__(self):
         """
         Model prints with number of trainable parameters
-        """
+        # """
+        # name = None
         model_parameters = filter(lambda p: p.requires_grad, self.parameters())
         params = sum([np.prod(p.size()) for p in model_parameters])
-        return super().__class__.__name__ + '\nTrainable parameters: {}'.format(params)
+        return str(self.__class__.__name__) + ' that has {} Trainable parameters'.format(params)

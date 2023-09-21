@@ -33,18 +33,11 @@ class SR_dataLoader(BaseDataLoader):
         
         lr_data_transforms = A.Compose([
             A.Resize(64,64),
-            A.Normalize( 
-                mean=[0.36216428, 0.34984875, 0.31362289, 0.64904877],
-                std=[0.03167508, 0.0365381,  0.05690316, 0.10670577]
-            ),
+            
             ToTensorV2(),
         ])
         hr_data_transforms = A.Compose([
             A.Resize(256,256),
-            A.Normalize( 
-                mean=[0.08677412, 0.12857, 0.10717302, 0.63853952],
-                std=[0.02621013, 0.03286405, 0.05179945, 0.1277203]
-            ),
             ToTensorV2(),
         ])
         self.dataset = SrDataset(LR_root=self.data_dir_LR,HR_root=self.data_dir_HR,
