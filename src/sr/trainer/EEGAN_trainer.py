@@ -34,8 +34,7 @@ class EEGAN_Trainer(BaseTrainer):
         
         metrics = Metrics(config)
         
-        lr_scheduler = None
-        #LR_Scheduler(optimizers=[opt_G, opt_D],config=config)
+        lr_scheduler = LR_Scheduler(optimizers=[opt_G, opt_D],config=config)
         
         super().__init__(generator,discriminator,opt_G,opt_D,config,
                          logger,data_loader,metrics, val_data_loader,lr_scheduler=lr_scheduler)
@@ -126,7 +125,7 @@ class EEGAN_Trainer(BaseTrainer):
           if epoch % self.config.train.train_val_freq == 0:
               val_log = self._valid_epoch(epoch, train = True, log=log)
               log.update(val_log)
-          if self.lr_scheduler is not None:
+          if self.lr_scheduler is not None and epoch >15:
               self.lr_scheduler.step()
           if epoch % self.plot_freq == 0:
               self.logger.info("==> plotting some examples <==")
