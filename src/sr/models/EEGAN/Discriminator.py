@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-
-class Discriminator_VGG_128(nn.Module):
+from sr.base.base_model import BaseModel
+class Discriminator_VGG_128(BaseModel):
     def __init__(self, in_nc, nf):
         super(Discriminator_VGG_128, self).__init__()
         # [64, 128, 128]
