@@ -24,6 +24,7 @@ class ContentLoss(nn.Module):
         try:
             self.logger.info("===> loading the vgg19 model <===")
             self.vgg = torch.hub.load('pytorch/vision:v0.9.0', 'vgg19', pretrained=True).features[:36].eval().to(self.DEVICE)
+            self.vgg = self.vgg.double()
             self.logger.info("===> the vgg19 loaded successfully <===")
         except :
             self.logger.exception("the vgg model is not loaded properly, cheack you internet connection!")
@@ -34,9 +35,10 @@ class ContentLoss(nn.Module):
             param.requires_grad = False
 
     def forward(self, IBase, IHR):
-        
-        IBase_features = self.vgg(apply_pca(IBase,self.DEVICE))
-        IHR_features = self.vgg(apply_pca(IHR,self.DEVICE))
+        I_Base_compressed = apply_pca(IBase,self.DEVICE)
+        IHR_compressed = apply_pca(IHR,self.DEVICE)
+        IBase_features = self.vgg(I_Base_compressed)
+        IHR_features = self.vgg(IHR_compressed)
         loss = self.loss(IBase_features,IHR_features)
         return loss
     

@@ -3,6 +3,7 @@ import torch.nn as nn
 from tqdm import tqdm 
 from sr.base.base_trainer import BaseTrainer
 from sr.models.EEGAN.Gen_components import ESRGAN_EESN
+from sr.models.EEGAN.generator import EEGAN_generator
 from sr.models.EEGAN.Discriminator import Discriminator_VGG_128
 from sr.data_loader.data_loaders import SR_dataLoader
 from sr.metrics.metrics import Metrics
@@ -16,8 +17,10 @@ class EEGAN_Trainer(BaseTrainer):
     """
     def __init__(self, config ,logger):
 
+
         generator = ESRGAN_EESN(config.network_G.in_nc,config.network_G.out_nc,config.network_G.features,config.network_G.nb)
         discriminator = Discriminator_VGG_128(config.network_D.in_nc,config.network_D.features)
+        
         
         opt_G = torch.optim.Adam(generator.parameters(),
                                       config.optimizer.args.lr_G, betas=(config.optimizer.args.beta1_G,config.optimizer.args.beta2_G))
@@ -32,7 +35,8 @@ class EEGAN_Trainer(BaseTrainer):
         
         metrics = Metrics(config)
         
-        lr_scheduler = LR_Scheduler(optimizers=[opt_G, opt_D],config=config)
+        lr_scheduler = None
+        #LR_Scheduler(optimizers=[opt_G, opt_D],config=config)
         
         super().__init__(generator,discriminator,opt_G,opt_D,config,
                          logger,data_loader,metrics, val_data_loader,lr_scheduler=lr_scheduler)
@@ -139,13 +143,10 @@ class EEGAN_Trainer(BaseTrainer):
         self.model_G.eval()
         
         if log is not None:
-            if not train:
-                log.update({key + "_val": 0 for key in self.config.metrics})
-            else:
-                log.update({key + "_train": 0 for key in self.config.metrics})
+          log.update({key: 0 for key in self.config.metrics})
         
         with torch.no_grad():
-            for batch_idx, (data, target) in enumerate(self.valid_data_loader) if not train else  enumerate(self.data_loader):
+            for batch_idx, (data, target) in enumerate(self.data_loader_valid) if not train else  enumerate(self.data_loader):
                 _, target = data.to(self.device), target.to(self.device)
 
                 output = self.model(data)
@@ -157,7 +158,11 @@ class EEGAN_Trainer(BaseTrainer):
             if train:
                 log[key] = log[key] / len(self.data_loader)
             else:
-                log[key] = log[key] / len(self.data_loader_valid)                
+                log[key] = log[key] / len(self.data_loader_valid) 
+        if train:
+          log.update({"validation on":"training set"})
+        else:
+          log.update({"validation on":"val set"})
         return log
     
     def plot_examples(self):

@@ -132,7 +132,7 @@ def apply_pca(images,DEVICE):
     compressed_images = np.transpose(compressed_images, (0, 3, 1, 2))
 
     # Convert back to torch.Tensor
-    compressed_images = torch.from_numpy(compressed_images).to(DEVICE)
+    compressed_images = torch.from_numpy(compressed_images).to(DEVICE).double()
 
     return compressed_images
 

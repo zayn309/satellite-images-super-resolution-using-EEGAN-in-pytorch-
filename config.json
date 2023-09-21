@@ -9,7 +9,7 @@
         "in_nc": 4,
         "out_nc":4,
         "features":64,
-        "nb" : 23,
+        "nb" : 16,
         "args": {}
     },
     "network_D": {
@@ -35,7 +35,7 @@
         "args":{
             "data_dir_HR": "data/SR_data/HR/",
             "data_dir_LR": "data/SR_data/LR/",
-            "batch_size": 4,
+            "batch_size": 8,
             "shuffle": true,
             "validation_split": 0.0219,
             "num_workers": 0
@@ -55,7 +55,7 @@
         "gamma":1e-2
     },
     "train": {
-        "niter": 500,
+        "niter": 100,
         "manual_seed": 10,
         "train_val_freq":50,
         "val_freq": 1,
@@ -71,7 +71,7 @@
         "SR_image": "saved/plotted examples/SR image"
     },
     "logger": {
-      "save_checkpoint_freq": 50,
+      "save_checkpoint_freq": 15,
       "log_step": 100
     }
 }
