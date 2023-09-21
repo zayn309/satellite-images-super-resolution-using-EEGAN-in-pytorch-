@@ -34,8 +34,7 @@ class EEGAN_Trainer(BaseTrainer):
         
         metrics = Metrics(config)
         
-        lr_scheduler = None
-        #LR_Scheduler(optimizers=[opt_G, opt_D],config=config)
+        lr_scheduler = LR_Scheduler(optimizers=[opt_G, opt_D],config=config)
         
         super().__init__(generator,discriminator,opt_G,opt_D,config,
                          logger,data_loader,metrics, val_data_loader,lr_scheduler=lr_scheduler)
@@ -110,23 +109,24 @@ class EEGAN_Trainer(BaseTrainer):
             log.update({"total_loss" : total_loss.item(),
                         "vgg_loss" : content_loss.item(),
                         "cst_loss" : consistency_loss.item(),
-                        "pixel_loss" : pixel_loss.item,
-                        "loss_adv": gen_adv_loss,
-                        "loss_disc" : loss_disc
+                        "pixel_loss" : pixel_loss.item(),
+                        "loss_adv": gen_adv_loss.item(),
+                        "loss_disc" : loss_disc.item()
                         })
             
             if batch_idx == self.len_epoch:
                 break
         
 
-        if self.current_epoch % self.config.train.val_freq == 0:
+        if epoch % self.config.train.val_freq == 0:
             val_log = self._valid_epoch(epoch,train=False, log=log)
             log.update(val_log)
-        if self.current_epoch % self.config.train.train_val_freq == 0:
+        if epoch % self.config.train.train_val_freq == 0:
             val_log = self._valid_epoch(epoch, train = True, log=log)
+            log.update(val_log)
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
-        if self.current_epoch % self.plot_freq == 0:
+        if epoch % self.plot_freq == 0:
             self.logger.info("==> plotting some examples <==")
             self.plot_examples()
         
