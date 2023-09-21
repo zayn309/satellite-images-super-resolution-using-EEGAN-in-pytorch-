@@ -75,7 +75,6 @@ class BaseTrainer:
 
             if epoch % self.save_period == 0:
                 self._save_checkpoint(epoch)
-            break
 
     def _prepare_device(self, n_gpu_use): # working 
         """

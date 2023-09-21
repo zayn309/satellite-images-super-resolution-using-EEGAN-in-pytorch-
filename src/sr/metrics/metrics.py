@@ -2,7 +2,8 @@ import torch
 from skimage.metrics import structural_similarity as ssim
 import numpy as np
 from sr.utils.utils import get_config
-
+import warnings
+warnings.filterwarnings("ignore")
 class Metrics():
     def __init__(self, config, log = None):
         metrics = config.metrics
