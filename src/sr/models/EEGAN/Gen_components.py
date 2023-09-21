@@ -1,3 +1,4 @@
+from sr.base.base_model import BaseModel
 import torch
 import torch.nn as nn
 from functools import partial
@@ -328,7 +329,7 @@ class EESN(nn.Module):
         return x_learned_lap, x_lap
     
 
-class ESRGAN_EESN(nn.Module):
+class ESRGAN_EESN(BaseModel):
     def __init__(self, in_nc, out_nc, nf, nb):
         super(ESRGAN_EESN, self).__init__()
         self.netRG = RRDBNet(in_nc, out_nc, nf, nb)
@@ -340,3 +341,5 @@ class ESRGAN_EESN(nn.Module):
         x_sr = x5 + x_base - x_lap
 
         return x_base, x_sr, x5, x_lap
+    def __str__(self):
+        return f'{super().__str__()} '

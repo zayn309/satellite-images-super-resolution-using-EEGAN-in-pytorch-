@@ -1,5 +1,5 @@
 {
-    "arch" : "EEGAN",
+    "arch" : "ESRGAN_EESN",
     "n_gpu": 1,
     "scale": 4,
     "lr_width": 64,
