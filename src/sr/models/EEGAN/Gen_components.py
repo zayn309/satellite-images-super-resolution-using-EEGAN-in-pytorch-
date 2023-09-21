@@ -69,12 +69,12 @@ class RRDBNet(nn.Module):
         self.RRDB_trunk = make_layer(RRDB_block_f, nb)
         self.trunk_conv = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
         #### upsampling
-        # self.upconv1 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
-        # self.upconv2 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
-        # self.HRconv = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
+        self.upconv1 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
+        self.upconv2 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
+        self.HRconv = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
         # self.conv_last = nn.Conv2d(nf, out_nc, 3, 1, 1, bias=True)
         self.up = UpsamplingBlock(nf,nf,4)
-        #self.lrelu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
+        self.lrelu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
 
     def forward(self, x):
         fea = self.conv_first(x)
@@ -84,10 +84,12 @@ class RRDBNet(nn.Module):
         # fea = self.lrelu(self.upconv1(F.interpolate(fea, scale_factor=2, mode='nearest')))
         # fea = self.lrelu(self.upconv2(F.interpolate(fea, scale_factor=2, mode='nearest')))
         # out = self.conv_last(self.lrelu(self.HRconv(fea)))
+        out = self.lrelu(self.upconv1(fea))
+        out = self.lrelu(self.upconv2(fea))
+        out = self.lrelu(self.upconv1(fea))
         out = self.up(fea)
 
         return out
-
 
 # UDSN components
 class ConvLayer(nn.Module):  
