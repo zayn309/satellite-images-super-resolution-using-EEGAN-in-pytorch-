@@ -86,7 +86,7 @@ class RRDBNet(nn.Module):
         # out = self.conv_last(self.lrelu(self.HRconv(fea)))
         out = self.lrelu(self.upconv1(fea))
         out = self.lrelu(self.upconv2(fea))
-        out = self.lrelu(self.upconv1(fea))
+        out = self.lrelu(self.HRconv(fea))
         out = self.up(fea)
 
         return out
