@@ -51,7 +51,7 @@ class EEGAN_Trainer(BaseTrainer):
         self.lamda = self.config.loss.lamda
         
         self.consistencyLoss = CharbonnierLoss().to(self.device)
-        self.contentLoss = ContentLoss(self.device,config=self.config,logger=self.logger)
+        self.contentLoss = ContentLoss(self.device,logger=self.logger)
         self.BCE = nn.BCEWithLogitsLoss()
         
     def _train_epoch(self, epoch):

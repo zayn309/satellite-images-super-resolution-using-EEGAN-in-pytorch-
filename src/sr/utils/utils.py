@@ -5,9 +5,10 @@ from datetime import datetime
 import os
 from box import ConfigBox
 import random
-import numpy as np
 import tifffile as tiff
 import torch
+import numpy as np
+from sklearn.decomposition import PCA
 
 def read_json(fname):
     fname = Path(fname)
@@ -91,3 +92,43 @@ def plot_examples(I_Base, lap, learned_lap, I_sr, config):
 
     # Return the updated counter
     return counter
+
+
+def apply_pca(images,DEVICE):
+    """
+    Apply PCA to compress the number of channels from 4 to 3.
+
+    Args:
+        images (torch.Tensor): Tensor of images with shape (batch_size, channels, width, height).
+
+    Returns:
+        torch.Tensor: Compressed images with shape (batch_size, 3, width, height).
+    """
+    batch_size, channels, width, height = images.shape
+
+    # Convert to numpy array for PCA
+    images_np = images.cpu().numpy()
+
+    # Reshape images to (batch_size, channels, -1)
+    images_reshaped = np.reshape(images_np, (batch_size, channels, -1))
+
+    # Reshape to (batch_size, -1, channels) for PCA
+    images_for_pca = np.transpose(images_reshaped, (0, 2, 1))
+
+    # Reshape back to (batch_size * width * height, channels) for PCA
+    images_for_pca = np.reshape(images_for_pca, (-1, channels))
+
+    # Apply PCA
+    pca = PCA(n_components=3)
+    compressed_images = pca.fit_transform(images_for_pca)
+
+    # Reshape back to (batch_size, width, height, 3)
+    compressed_images = np.reshape(compressed_images, (batch_size, width, height, 3))
+
+    # Reshape to (batch_size, 3, width, height)
+    compressed_images = np.transpose(compressed_images, (0, 3, 1, 2))
+
+    # Convert back to torch.Tensor
+    compressed_images = torch.from_numpy(compressed_images).to(DEVICE)
+
+    return compressed_images
