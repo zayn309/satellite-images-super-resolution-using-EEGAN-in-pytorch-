@@ -164,8 +164,9 @@ class EEGAN_Trainer(BaseTrainer):
         return log
     
     def plot_examples(self):
-        random_batch = next(iter(self.data_loader))
+        data,_ = next(iter(self.data_loader))
+        data = data.to(self.device)
         self.model_G.eval()
-        I_base, I_sr, I_learned_lap, I_lap = self.model_G(random_batch)
+        I_base, I_sr, I_learned_lap, I_lap = self.model_G(data)
         plot_examples(I_base,I_lap,I_learned_lap,I_sr,self.config)
         

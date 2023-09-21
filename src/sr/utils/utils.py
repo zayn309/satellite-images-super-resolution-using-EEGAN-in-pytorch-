@@ -69,7 +69,7 @@ def dict2str(opt, indent_l=1):
 def plot_examples(I_Base, lap, learned_lap, I_sr, config):
     def save_images(image_tensor, save_dir, prefix):
         for i, image in enumerate(image_tensor):
-            image = image.permute(1, 2, 0).cpu().numpy()
+            image = image.permute(1, 2, 0).cpu().detach().numpy()
             save_path = str(Path(save_dir) / f"{prefix}_{counter}.tiff" )
             tiff.imsave(save_path, image)
     
