@@ -57,11 +57,11 @@
     "train": {
         "niter": 100,
         "manual_seed": 10,
-        "train_val_freq":50,
+        "train_val_freq":100,
         "val_freq": 1,
         "resume": null,
         "save_dir": "saved/check points",
-        "plote_examples_freq": 5,
+        "plote_examples_freq": 3,
         "save_period": 10
     },
     "examples_dir": {
