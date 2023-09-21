@@ -31,7 +31,7 @@ from sr.utils.utils import (get_config, plot_examples)
 import matplotlib.pyplot as plt 
 import tifffile as tiff 
 import numpy as np
-
+import os
 
 # hr = np.array(torch.permute(target,dims = (0,2,3,1))[0,:,:,:])
 
@@ -86,3 +86,33 @@ import numpy as np
 # # print()
 # plt.imshow(compressed[0,:,:,:])
 # plt.show()
+bad_data_lr = ['LR.33.tif',
+              'LR.60.tif',
+              'LR.72.tif',
+              'LR.86.tif',
+              'LR.181.tif',
+              'LR.268.tif']
+
+bad_data_hr = [ 'HR.33.tif',
+                'HR.60.tif',
+                'HR.72.tif',
+                'HR.86.tif',
+                'HR.181.tif',
+                'HR.268.tif']
+
+# Define the directory paths
+hr_dir = "data/SR_data/HR"
+lr_dir = "data/SR_data/LR"
+
+# Function to delete files with specified numbers
+def delete_files_with_numbers(directory, bad_data_lr):
+    for file_ in bad_data_lr:
+
+        file_path = os.path.join(directory, file_)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"Deleted {file_}")
+
+# Delete bad LR files
+delete_files_with_numbers(lr_dir, bad_data_lr)
+delete_files_with_numbers(hr_dir, bad_data_hr)
