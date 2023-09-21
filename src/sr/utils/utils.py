@@ -66,13 +66,13 @@ def dict2str(opt, indent_l=1):
     return msg
 
 
-def plot_examples(I_Base, lap, learned_lap, I_sr, config):
-    def save_images(image_tensor, save_dir, prefix):
+def plot_examples(I_Base, lap, learned_lap, I_sr, IHR, ILR, config):
+    def save_images(image_tensor, save_dir, prefix, counter):
         for i, image in enumerate(image_tensor):
             image = image.permute(1, 2, 0).cpu().detach().numpy()
-            save_path = str(Path(save_dir) / f"{prefix}_{counter}.tiff" )
+            save_path = str(Path(save_dir) / f"{prefix}_{counter}.tiff")
             tiff.imsave(save_path, image)
-    
+
     if not isinstance(I_Base, torch.Tensor):
         raise ValueError("Input batch should be a torch.Tensor")
 
@@ -80,21 +80,28 @@ def plot_examples(I_Base, lap, learned_lap, I_sr, config):
         raise ValueError("Input batch should be in the shape of (batch_size, channels, width, height)")
 
     counter = len(os.listdir(Path(config.examples_dir.base_image))) + 1
-    
+
     # Save I_Base images
-    save_images(I_Base, config.examples_dir.base_image, "I_Base")
-    
+    save_images(I_Base, config.examples_dir.base_image, "I_Base", counter)
+
     # Save lap images
-    save_images(lap, config.examples_dir.edge, "lap")
-    
+    save_images(lap, config.examples_dir.edge, "lap", counter)
+
     # Save learned_lap images
-    save_images(learned_lap, config.examples_dir.learned_edge, "learned_lap")
-    
+    save_images(learned_lap, config.examples_dir.learned_edge, "learned_lap", counter)
+
     # Save I_sr images
-    save_images(I_sr, config.examples_dir.SR_image, "I_sr")
+    save_images(I_sr, config.examples_dir.SR_image, "I_sr", counter)
+
+    # Save IHR images
+    save_images(IHR, config.examples_dir.IHR, "IHR", counter)
+
+    # Save ILR images
+    save_images(ILR, config.examples_dir.ILR, "ILR", counter)
 
     # Return the updated counter
     return counter
+
 
 
 def apply_pca(images,DEVICE):

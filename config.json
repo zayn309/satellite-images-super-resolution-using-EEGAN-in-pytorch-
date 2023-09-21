@@ -68,7 +68,9 @@
         "base_image": "saved/plotted examples/base image",
         "edge" : "saved/plotted examples/edge",
         "learned_edge": "saved/plotted examples/learned edge",
-        "SR_image": "saved/plotted examples/SR image"
+        "SR_image": "saved/plotted examples/SR image",
+        "IHR" : "saved/plotted examples/IHR",
+        "ILR" : "saved/plotted examples/ILR"
     },
     "logger": {
       "save_checkpoint_freq": 15,

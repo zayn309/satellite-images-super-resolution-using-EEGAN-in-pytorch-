@@ -34,7 +34,8 @@ class EEGAN_Trainer(BaseTrainer):
         
         metrics = Metrics(config)
         
-        lr_scheduler = LR_Scheduler(optimizers=[opt_G, opt_D],config=config)
+        lr_scheduler = None
+        #LR_Scheduler(optimizers=[opt_G, opt_D],config=config)
         
         super().__init__(generator,discriminator,opt_G,opt_D,config,
                          logger,data_loader,metrics, val_data_loader,lr_scheduler=lr_scheduler)
@@ -117,18 +118,22 @@ class EEGAN_Trainer(BaseTrainer):
             if batch_idx == self.len_epoch:
                 break
         
-
+        
         if epoch % self.config.train.val_freq == 0:
             val_log = self._valid_epoch(epoch,train=False, log=log)
             log.update(val_log)
-        if epoch % self.config.train.train_val_freq == 0:
-            val_log = self._valid_epoch(epoch, train = True, log=log)
-            log.update(val_log)
-        if self.lr_scheduler is not None:
-            self.lr_scheduler.step()
-        if epoch % self.plot_freq == 0:
-            self.logger.info("==> plotting some examples <==")
-            self.plot_examples()
+        try:
+          if epoch % self.config.train.train_val_freq == 0:
+              val_log = self._valid_epoch(epoch, train = True, log=log)
+              log.update(val_log)
+          if self.lr_scheduler is not None:
+              self.lr_scheduler.step()
+          if epoch % self.plot_freq == 0:
+              self.logger.info("==> plotting some examples <==")
+              self.plot_examples()
+        except Exception as e:
+          print(e)
+          pass
         
         return log
 
@@ -164,9 +169,9 @@ class EEGAN_Trainer(BaseTrainer):
         return log
     
     def plot_examples(self):
-        data,_ = next(iter(self.data_loader))
+        data, target = next(iter(self.data_loader))
         data = data.to(self.device)
         self.model_G.eval()
         I_base, I_sr, I_learned_lap, I_lap = self.model_G(data)
-        plot_examples(I_base,I_lap,I_learned_lap,I_sr,self.config)
+        plot_examples(I_base,I_lap,I_learned_lap,I_sr,data, target,self.config)
         
