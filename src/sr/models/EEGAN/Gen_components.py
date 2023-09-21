@@ -8,6 +8,19 @@ from kornia.filters import laplacian
 from sr.utils.utils import (initialize_weights, make_layer)
 
 
+class UpsamplingBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, scale_factor):
+        super(UpsamplingBlock, self).__init__()
+        self.conv_prelu = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.PReLU(out_channels)
+        )
+        self.sub_pixel_conv = nn.PixelShuffle(scale_factor)
+
+    def forward(self, x):
+        x = self.conv_prelu(x)
+        x = self.sub_pixel_conv(x)
+        return x
 
 
 class ResidualDenseBlock_5C(nn.Module):
@@ -56,21 +69,22 @@ class RRDBNet(nn.Module):
         self.RRDB_trunk = make_layer(RRDB_block_f, nb)
         self.trunk_conv = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
         #### upsampling
-        self.upconv1 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
-        self.upconv2 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
-        self.HRconv = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
-        self.conv_last = nn.Conv2d(nf, out_nc, 3, 1, 1, bias=True)
-
-        self.lrelu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
+        # self.upconv1 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
+        # self.upconv2 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
+        # self.HRconv = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
+        # self.conv_last = nn.Conv2d(nf, out_nc, 3, 1, 1, bias=True)
+        self.up = UpsamplingBlock(nf,nf,4)
+        #self.lrelu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
 
     def forward(self, x):
         fea = self.conv_first(x)
         trunk = self.trunk_conv(self.RRDB_trunk(fea))
         fea = fea + trunk
 
-        fea = self.lrelu(self.upconv1(F.interpolate(fea, scale_factor=2, mode='nearest')))
-        fea = self.lrelu(self.upconv2(F.interpolate(fea, scale_factor=2, mode='nearest')))
-        out = self.conv_last(self.lrelu(self.HRconv(fea)))
+        # fea = self.lrelu(self.upconv1(F.interpolate(fea, scale_factor=2, mode='nearest')))
+        # fea = self.lrelu(self.upconv2(F.interpolate(fea, scale_factor=2, mode='nearest')))
+        # out = self.conv_last(self.lrelu(self.HRconv(fea)))
+        out = self.up(fea)
 
         return out
 
@@ -205,22 +219,7 @@ class Dense_block(nn.Module):
         x = torch.cat(x,dim = 1)
         x = self.block5(x)
         return x + residual
-    
-class UpsamplingBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, scale_factor):
-        super(UpsamplingBlock, self).__init__()
-        self.conv_prelu = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
-            nn.PReLU(out_channels)
-        )
-        self.sub_pixel_conv = nn.PixelShuffle(scale_factor)
-
-    def forward(self, x):
-        x = self.conv_prelu(x)
-        x = self.sub_pixel_conv(x)
-        return x
-
-
+  
 # EESN components
 class BeginEdgeConv(nn.Module):
     def __init__(self):
@@ -300,14 +299,19 @@ class FinalConv(nn.Module):
         self.upconv1 = nn.Conv2d(256, 128, 3, 1, 1, bias=True)
         self.upconv2 = nn.Conv2d(128, 128, 3, 1, 1, bias=True)
         self.HRconv = nn.Conv2d(128, 64, 3, 1, 1, bias=True)
-        self.conv_last = nn.Conv2d(64, 4, 3, 1, 1, bias=True)
+        # self.conv_last = nn.Conv2d(64, 4, 3, 1, 1, bias=True)
+        self.up = UpsamplingBlock(64,64,4)
         self.lrelu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
+        
 
     def forward(self, x):
-        x = self.lrelu(self.upconv1(F.interpolate(x, scale_factor=2, mode='nearest')))
-        x = self.lrelu(self.upconv2(F.interpolate(x, scale_factor=2, mode='nearest')))
-        x = self.conv_last(self.lrelu(self.HRconv(x)))
-
+#         x = self.lrelu(self.upconv1(F.interpolate(x, scale_factor=2, mode='nearest')))
+#         x = self.lrelu(self.upconv2(F.interpolate(x, scale_factor=2, mode='nearest')))
+#         x = self.conv_last(self.lrelu(self.HRconv(x)))
+        x = self.lrelu(self.upconv1(x))
+        x = self.lrelu(self.upconv2(x))
+        x = self.lrelu(self.HRconv(x))
+        x = self.up(x)
         return x
 
 class EESN(nn.Module):

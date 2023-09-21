@@ -9,7 +9,7 @@
         "in_nc": 4,
         "out_nc":4,
         "features":64,
-        "nb" : 16,
+        "nb" : 23,
         "args": {}
     },
     "network_D": {
