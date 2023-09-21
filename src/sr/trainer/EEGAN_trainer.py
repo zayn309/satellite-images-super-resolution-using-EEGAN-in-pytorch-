@@ -3,7 +3,6 @@ import torch.nn as nn
 from tqdm import tqdm 
 from sr.base.base_trainer import BaseTrainer
 from sr.models.EEGAN.Gen_components import ESRGAN_EESN
-from sr.models.EEGAN.generator import EEGAN_generator
 from sr.models.EEGAN.Discriminator import Discriminator_VGG_128
 from sr.data_loader.data_loaders import SR_dataLoader
 from sr.metrics.metrics import Metrics
