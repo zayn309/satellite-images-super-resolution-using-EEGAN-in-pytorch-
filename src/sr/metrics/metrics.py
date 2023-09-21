@@ -35,9 +35,9 @@ class Metrics():
         mse_value = self._mse(original, distorted)
         
         return {
-            'PSNR': psnr_value.item(),
-            'SSIM': ssim_value.item(),
-            'MSE': mse_value.item()
+            'psnr': psnr_value.item(),
+            'ssim': ssim_value.item(),
+            'mse': mse_value.item()
         }
 
 # def test():

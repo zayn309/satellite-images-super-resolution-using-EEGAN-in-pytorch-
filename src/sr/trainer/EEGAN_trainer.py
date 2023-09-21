@@ -146,9 +146,8 @@ class EEGAN_Trainer(BaseTrainer):
         
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(self.data_loader_valid) if not train else  enumerate(self.data_loader):
-                _, target = data.to(self.device), target.to(self.device)
-
-                output = self.model(data)
+                data, target = data.to(self.device), target.to(self.device)
+                _,output,_,_ = self.model_G(data)
                 results = self.metrics.result(target,output)
                 for key in results:
                     log[key] = log[key] + results[key]
