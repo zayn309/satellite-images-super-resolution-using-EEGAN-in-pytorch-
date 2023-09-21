@@ -48,7 +48,7 @@ class EEGAN_Trainer(BaseTrainer):
         self.loss_terms = self.config.loss.terms
         self.alpha = self.config.loss.alpha
         self.lamda = self.config.loss.lamda
-        self.gamma = self.config.gamma
+        self.gamma = self.config.loss.gamma
         
         self.consistencyLoss = CharbonnierLoss().to(self.device)
         self.contentLoss = ContentLoss(self.device,logger=self.logger)

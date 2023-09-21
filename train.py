@@ -10,3 +10,4 @@ def main(config):
     
 if __name__ == '__main__':
     config = get_config("config.json")
+    main(config)

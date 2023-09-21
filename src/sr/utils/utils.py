@@ -110,7 +110,7 @@ def apply_pca(images,DEVICE):
     batch_size, channels, width, height = images.shape
 
     # Convert to numpy array for PCA
-    images_np = images.cpu().numpy()
+    images_np = images.detach().cpu().numpy()
 
     # Reshape images to (batch_size, channels, -1)
     images_reshaped = np.reshape(images_np, (batch_size, channels, -1))
