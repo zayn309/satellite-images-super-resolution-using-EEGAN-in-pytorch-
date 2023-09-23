@@ -72,8 +72,8 @@ class RRDBNet(nn.Module):
         self.upconv1 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
         self.upconv2 = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
         self.HRconv = nn.Conv2d(nf, nf, 3, 1, 1, bias=True)
-        # self.conv_last = nn.Conv2d(nf, out_nc, 3, 1, 1, bias=True)
-        self.up = UpsamplingBlock(nf,nf,4)
+        self.conv_last = nn.Conv2d(nf, out_nc, 3, 1, 1, bias=True)
+        # self.up = UpsamplingBlock(nf,nf,4)
         self.lrelu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
 
     def forward(self, x):
@@ -81,13 +81,13 @@ class RRDBNet(nn.Module):
         trunk = self.trunk_conv(self.RRDB_trunk(fea))
         fea = fea + trunk
 
-        # fea = self.lrelu(self.upconv1(F.interpolate(fea, scale_factor=2, mode='nearest')))
-        # fea = self.lrelu(self.upconv2(F.interpolate(fea, scale_factor=2, mode='nearest')))
-        # out = self.conv_last(self.lrelu(self.HRconv(fea)))
-        out = self.lrelu(self.upconv1(fea))
-        out = self.lrelu(self.upconv2(fea))
-        out = self.lrelu(self.HRconv(fea))
-        out = self.up(fea)
+        fea = self.lrelu(self.upconv1(F.interpolate(fea, scale_factor=2, mode='nearest')))
+        fea = self.lrelu(self.upconv2(F.interpolate(fea, scale_factor=2, mode='nearest')))
+        out = self.conv_last(self.lrelu(self.HRconv(fea)))
+        # out = self.lrelu(self.upconv1(fea))
+        # out = self.lrelu(self.upconv2(fea))
+        # out = self.lrelu(self.HRconv(fea))
+        # out = self.up(fea)
 
         return out
 
@@ -301,19 +301,19 @@ class FinalConv(nn.Module):
         self.upconv1 = nn.Conv2d(256, 128, 3, 1, 1, bias=True)
         self.upconv2 = nn.Conv2d(128, 128, 3, 1, 1, bias=True)
         self.HRconv = nn.Conv2d(128, 64, 3, 1, 1, bias=True)
-        # self.conv_last = nn.Conv2d(64, 4, 3, 1, 1, bias=True)
-        self.up = UpsamplingBlock(64,64,4)
+        self.conv_last = nn.Conv2d(64, 4, 3, 1, 1, bias=True)
+        # self.up = UpsamplingBlock(64,64,4)
         self.lrelu = nn.LeakyReLU(negative_slope=0.2, inplace=True)
         
 
     def forward(self, x):
-#         x = self.lrelu(self.upconv1(F.interpolate(x, scale_factor=2, mode='nearest')))
-#         x = self.lrelu(self.upconv2(F.interpolate(x, scale_factor=2, mode='nearest')))
-#         x = self.conv_last(self.lrelu(self.HRconv(x)))
-        x = self.lrelu(self.upconv1(x))
-        x = self.lrelu(self.upconv2(x))
-        x = self.lrelu(self.HRconv(x))
-        x = self.up(x)
+        x = self.lrelu(self.upconv1(F.interpolate(x, scale_factor=2, mode='nearest')))
+        x = self.lrelu(self.upconv2(F.interpolate(x, scale_factor=2, mode='nearest')))
+        x = self.conv_last(self.lrelu(self.HRconv(x)))
+        # x = self.lrelu(self.upconv1(x))
+        # x = self.lrelu(self.upconv2(x))
+        # x = self.lrelu(self.HRconv(x))
+        # x = self.up(x)
         return x
 
 class EESN(nn.Module):
