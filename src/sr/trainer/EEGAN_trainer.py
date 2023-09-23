@@ -56,6 +56,8 @@ class EEGAN_Trainer(BaseTrainer):
         self.contentLoss = ContentLoss(self.device,logger=self.logger)
         self.BCE = nn.BCEWithLogitsLoss()
         self.l1_loss = nn.L1Loss()
+        if self.config.train.use_valid_pretrained_weights:
+          self.load_pretrained()
         
     def _train_epoch(self, epoch):
         # L(θG, θD) = Losscont(θG) + αLossadv(θG, θD)+λLosscst(θG)
@@ -166,6 +168,35 @@ class EEGAN_Trainer(BaseTrainer):
         else:
           log.update({"validation on":"val set"})
         return log
+
+    def load_pretrained(self):
+      path_G = self.config.train.pretrained_G_path
+      path_D = self.config.train.pretrained_D_path
+      # load the generator
+      weights_G = torch.load(path_G)
+      for name, param in self.model_G.named_parameters():
+        if name in ['netRG.conv_first.weight', 'netRG.conv_first.bias','netRG.conv_last.weight','netRG.conv_last.bias','netE.beginEdgeConv.conv_layer1.weight','netE.beginEdgeConv.conv_layer1.bias','netE.finalConv.conv_last.weight','netE.finalConv.conv_last.bias']:
+          continue
+        else:
+          try:
+            param.data.copy_(weights_G[name])
+          except Exception as e:
+            print(e)
+            print(name)
+            break
+      # load the disc
+      weights_D = torch.load(path_D)
+      for name, param in self.model_D.named_parameters():
+          if name in ['conv0_0.weight','conv0_0.bias']:
+            continue
+          else:
+            try:
+              param.data.copy_(weights_D[name])
+            except Exception as e:
+              print(e)
+              print(name)
+              break
+
     
     def plot_examples(self):
         data, target = next(iter(self.data_loader))
