@@ -172,6 +172,7 @@ class EEGAN_Trainer(BaseTrainer):
     def load_pretrained(self):
       path_G = self.config.train.pretrained_G_path
       path_D = self.config.train.pretrained_D_path
+      self.logger.info("loading the pretrained weights")
       # load the generator
       weights_G = torch.load(path_G)
       for name, param in self.model_G.named_parameters():
@@ -196,7 +197,7 @@ class EEGAN_Trainer(BaseTrainer):
               print(e)
               print(name)
               break
-
+      self.logger.info("the pretrained weights was loaded successfully")
     
     def plot_examples(self):
         data, target = next(iter(self.data_loader))
