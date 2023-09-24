@@ -3,6 +3,14 @@ from sr.base.base_data_loader import BaseDataLoader
 from sr.datsets.sr_dataset import SrDataset
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
+from albumentations import (
+    HorizontalFlip, IAAPerspective, ShiftScaleRotate, CLAHE, RandomRotate90,
+    Transpose, ShiftScaleRotate, Blur, OpticalDistortion, GridDistortion, HueSaturationValue,
+    IAAAdditiveGaussianNoise, GaussNoise, MotionBlur, MedianBlur, IAAPiecewiseAffine,
+    IAASharpen, IAAEmboss, RandomBrightnessContrast, Flip, OneOf, Compose,
+    BboxParams, RandomCrop, Normalize, Resize, VerticalFlip
+)
+
 from sr.utils.utils import get_config
 
 class MnistDataLoader(BaseDataLoader):
@@ -33,15 +41,18 @@ class SR_dataLoader(BaseDataLoader):
         
         lr_data_transforms = A.Compose([
             A.Resize(64,64),
-            
             ToTensorV2(),
         ])
         hr_data_transforms = A.Compose([
             A.Resize(256,256),
             ToTensorV2(),
         ])
+        both_transorms = A.Compose([
+            A.HorizontalFlip(p=0.5),  # Apply horizontal flip with 50% probability
+            A.RandomRotate90(p=0.5),
+        ],additional_targets={'target':"image"})
         self.dataset = SrDataset(LR_root=self.data_dir_LR,HR_root=self.data_dir_HR,
-                                 lr_transform = lr_data_transforms, hr_transform = hr_data_transforms )
+                                 lr_transform = lr_data_transforms, hr_transform = hr_data_transforms, both_transorms = both_transorms )
         super().__init__(self.dataset, self.batch_size, self.shuffle, self.validation_split, self.num_workers)
         
 def test():

@@ -56,13 +56,13 @@
     },
     "train": {
         "niter": 100,
-        "use_valid_pretrained_weights":true,
-        "pretrained_G_path": "/content/gdrive/MyDrive/Copy of 170000_G.pth",
-        "pretrained_D_path": "/content/gdrive/MyDrive/Copy of 170000_D.pth",
+        "use_valid_pretrained_weights":false,
+        "pretrained_G_path": null,
+        "pretrained_D_path": null,
         "manual_seed": 10,
         "train_val_freq":100,
         "val_freq": 1,
-        "resume": null,
+        "resume": "saved/check points/checkpoint-epoch15.pth",
         "save_dir": "saved/check points",
         "plote_examples_freq": 3,
         "save_period": 10
