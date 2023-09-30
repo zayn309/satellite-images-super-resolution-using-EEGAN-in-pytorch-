@@ -16,7 +16,8 @@ navigate to the directory where the requirements.txt exists and run the command 
 ![image](https://github.com/zayn309/satellite-images-super-resolution-using-EEGAN-in-pytorch-/assets/102887305/64b98e28-db35-4a04-9985-95952854b002)
 #### SSIM - ```Structural Similarity Index``` 
 ![image](https://github.com/zayn309/satellite-images-super-resolution-using-EEGAN-in-pytorch-/assets/102887305/473ed806-754f-4724-8ea1-e4a99159c045)
-> Note: As the images is multidimensional, so these measures is calculated across all channels and then summed and normalized by the number of channels
+> **Note**
+> As the images is multidimensional, so these measures is calculated across all channels and then summed and normalized by the number of channels
 
 ## Dataset
 the dataset is from NARSS (National Authority for Remote Sensing and Space Sciences), and it consists of a single image with resolution 4648 x 4242 x 4 where 4 is the number of channels which are RGB and near infrared, then i cropped into smaller batches of shape 256 x 256 x 4, then applied bicubic interpolation to reduce the resolution of the images by a scale factor of 4 to get the low resolution images, and the shape of the low resolution images is 64 x 64 x 4. 
@@ -26,7 +27,8 @@ def scaleCCC(x):
     x = np.where(np.isnan(x), 0, x)
     return((x - np.nanpercentile(x, 2))/(np.nanpercentile(x, 98) - np.nanpercentile(x,2)))
 ```
-> Note: Not using the max value for the scaling but instead 98th percentile ensures clipping the outliers which can ruin the scalling hence the training.
+> **Note**
+> Not using the max value for the scaling but instead 98th percentile ensures clipping the outliers which can ruin the scalling hence the training.
 
 ## Loss
 I used a combination of multible losses to produce the final objective which consists of:
