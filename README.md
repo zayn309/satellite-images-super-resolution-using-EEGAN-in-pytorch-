@@ -10,6 +10,7 @@ the achitecture for the two models is the same for the discriminator, but the ch
 
 ## Dependencies and Installation
 navigate to the directory where the requirements.txt exists and run the command ```pip install -r requirements.txt ``` to install the packages.
+> **Note**
 > You're also gonna need an NVIDIA GPU + CUDA for the training, altho the inference can be done on the cpu but it's gonna be slow.
 ## metrics
 #### PSNR - ```peak signal-to-noise ratio```
@@ -17,7 +18,7 @@ navigate to the directory where the requirements.txt exists and run the command 
 #### SSIM - ```Structural Similarity Index``` 
 ![image](https://github.com/zayn309/satellite-images-super-resolution-using-EEGAN-in-pytorch-/assets/102887305/473ed806-754f-4724-8ea1-e4a99159c045)
 > **Note**
-> As the images is multidimensional, so these measures is calculated across all channels and then summed and normalized by the number of channels
+> As the images is multichannel, so these measures is calculated across all channels and then summed and normalized by the number of channels
 
 ## Dataset
 the dataset is from NARSS (National Authority for Remote Sensing and Space Sciences), and it consists of a single image with resolution 4648 x 4242 x 4 where 4 is the number of channels which are RGB and near infrared, then i cropped into smaller batches of shape 256 x 256 x 4, then applied bicubic interpolation to reduce the resolution of the images by a scale factor of 4 to get the low resolution images, and the shape of the low resolution images is 64 x 64 x 4. 
